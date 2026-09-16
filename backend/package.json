@@ -4,12 +4,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node --watch src/server.js",
-    "start": "node src/server.js",
-    "test": "vitest run",
-    "prisma:generate": "prisma generate",
-    "prisma:validate": "prisma validate",
-    "migrate:deploy": "prisma migrate deploy"
+  "dev": "node --watch src/server.js",
+  "start": "node src/server.js",
+  "test": "vitest run",
+  "prisma:generate": "prisma generate",
+  "prisma:validate": "prisma validate",
+  "migrate:deploy": "prisma migrate deploy"
   },
   "dependencies": {
     "@prisma/client": "6.12.0",

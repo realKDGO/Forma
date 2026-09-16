@@ -8,9 +8,9 @@ The React PWA writes to IndexedDB first. Records use browser-generated UUIDs and
 
 ## Database
 
-The connected Supabase project contains a dedicated `forma` schema. Migrations created the user, profile, goal, food, food log, favorite, weight, routine, workout, and mutation receipt records. The schema contains no development seed data. Every user-owned table has RLS, UUID identifiers, ownership constraints, and query indexes. The Forma user ID references `auth.users(id)`.
+The dedicated Supabase project is `Forma-db` (`gxsclhtopjxzxewxwezx`). It contains a private `forma` schema. Migrations created the user, profile, goal, food, food log, favorite, weight, routine, workout, and mutation receipt records. The schema contains no development seed data. Every user-owned table has RLS, UUID identifiers, ownership constraints, and query indexes. The Forma user ID references the `auth.users(id)` table in `Forma-db`.
 
-The schema is intentionally not mixed into the existing AgriPrice public tables. Supabase advisors were run after migration. Forma policy and foreign-key findings were resolved. Remaining advisor messages concern the existing AgriPrice schema or unused indexes on empty tables.
+Forma is isolated from `AgriPrice-db`. The temporary `forma` schema and its Forma migration records were removed from `AgriPrice-db` after the same three migrations were verified in `Forma-db`. AgriPrice's existing `public` schema was not modified. Supabase advisors were run after migration. Forma policy and foreign-key findings were resolved. Unused-index notices are expected while the new Forma tables are empty. A pre-existing `public.rls_auto_enable()` warning in `Forma-db` is unrelated to Forma and was left unchanged.
 
 ## Authentication
 
