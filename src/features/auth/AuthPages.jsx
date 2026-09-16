@@ -18,6 +18,7 @@ function AuthForm({ register = false }) {
   const [confirmationSent, setConfirmationSent] = useState(false);
   const submit = async (e) => {
     e.preventDefault();
+    if (!state) return setError("Forma is still loading. Please try again.");
     if (register && !name.trim()) return setError("Enter your name.");
     if (!email.includes("@") || password.length < 6)
       return setError(
@@ -30,9 +31,21 @@ function AuthForm({ register = false }) {
         setConfirmationSent(true);
         return;
       }
-      let remote={};
-      if(!register){try{remote=(await apiClient.get('/sync')).data.data}catch{remote={}}}
-      const nextProfile=register?{name:name.trim(),units:'metric'}:(remote.profile || state.profile);
+      let remote = {};
+      if (!register) {
+        try {
+          const syncData = (await apiClient.get("/sync"))?.data?.data;
+          remote =
+            syncData && typeof syncData === "object" && !Array.isArray(syncData)
+              ? syncData
+              : {};
+        } catch {
+          remote = {};
+        }
+      }
+      const nextProfile = register
+        ? { name: name.trim(), units: "metric" }
+        : remote.profile || state.profile || null;
       update({...state,...remote,profile:nextProfile,session:{authenticated:true,onboarded:register?false:!!nextProfile,userId:session.user.id}});
       go(register?'/onboarding':'/app/home');
     } catch (err) { setError(err.message || "Authentication failed."); }

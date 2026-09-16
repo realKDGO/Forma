@@ -138,6 +138,14 @@ export default function App() {
         </section>
       </div>
     );
+  if (!state)
+    return (
+      <div className="auth">
+        <section className="card auth-card">
+          <Loading />
+        </section>
+      </div>
+    );
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
