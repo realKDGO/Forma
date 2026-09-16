@@ -1,0 +1,32 @@
+{
+  "name": "forma-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "test": "vitest run",
+    "prisma:generate": "prisma generate",
+    "prisma:validate": "prisma validate",
+    "migrate:deploy": "prisma migrate deploy"
+  },
+  "dependencies": {
+    "@prisma/client": "6.12.0",
+    "@supabase/supabase-js": "2.57.4",
+    "cors": "2.8.5",
+    "express": "5.1.0",
+    "express-rate-limit": "8.7.0",
+    "helmet": "8.1.0",
+    "pino-http": "10.5.0",
+    "zod": "4.1.11"
+  },
+  "devDependencies": {
+    "prisma": "6.12.0",
+    "supertest": "7.1.4",
+    "vitest": "5.0.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

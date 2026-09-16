@@ -1,0 +1,283 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+  schemas   = ["forma"]
+}
+
+enum GoalType {
+  LOSE
+  MAINTAIN
+  GAIN
+
+  @@schema("forma")
+}
+
+enum ActivityLevel {
+  SEDENTARY
+  LIGHT
+  MODERATE
+  VERY
+  EXTREME
+
+  @@schema("forma")
+}
+
+enum FoodSource {
+  FORMA
+  USER
+  OPEN_FOOD_FACTS
+
+  @@schema("forma")
+}
+
+enum MealType {
+  BREAKFAST
+  LUNCH
+  DINNER
+  SNACKS
+
+  @@schema("forma")
+}
+
+enum WorkoutStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+
+  @@schema("forma")
+}
+
+model User {
+  id        String            @id @db.Uuid
+  email     String            @unique
+  createdAt DateTime          @default(now()) @map("created_at")
+  updatedAt DateTime          @updatedAt @map("updated_at")
+  profile   Profile?
+  goal      Goal?
+  foods     Food[]
+  logs      FoodLog[]
+  favorites FavoriteFood[]
+  weights   WeightLog[]
+  routines  Routine[]
+  workouts  Workout[]
+  receipts  MutationReceipt[]
+
+  @@map("users")
+  @@schema("forma")
+}
+
+model Profile {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @unique @map("user_id") @db.Uuid
+  name      String
+  birthDate DateTime? @map("birth_date") @db.Date
+  sex       String?
+  heightCm  Decimal?  @map("height_cm") @db.Decimal(6, 2)
+  units     String    @default("metric")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@map("profiles")
+  @@schema("forma")
+}
+
+model Goal {
+  id             String        @id @default(uuid()) @db.Uuid
+  userId         String        @unique @map("user_id") @db.Uuid
+  goalType       GoalType      @map("goal_type")
+  targetWeightKg Decimal?      @map("target_weight_kg") @db.Decimal(6, 2)
+  activityLevel  ActivityLevel @map("activity_level")
+  weeklyRateKg   Decimal?      @map("weekly_rate_kg") @db.Decimal(4, 2)
+  calories       Int
+  protein        Int
+  carbohydrates  Int
+  fat            Int
+  fiber          Int
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  @@map("goals")
+  @@schema("forma")
+}
+
+model Food {
+  id            String         @id @db.Uuid
+  ownerId       String?        @map("owner_id") @db.Uuid
+  externalId    String?        @map("external_id")
+  barcode       String?
+  name          String
+  brand         String?
+  servingAmount Decimal        @map("serving_amount") @db.Decimal(10, 3)
+  servingUnit   String         @map("serving_unit")
+  calories      Decimal        @db.Decimal(10, 3)
+  protein       Decimal        @db.Decimal(10, 3)
+  carbohydrates Decimal        @db.Decimal(10, 3)
+  fat           Decimal        @db.Decimal(10, 3)
+  fiber         Decimal        @db.Decimal(10, 3)
+  source        FoodSource
+  owner         User?          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  logs          FoodLog[]
+  favorites     FavoriteFood[]
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+
+  @@index([ownerId, name])
+  @@index([barcode])
+  @@map("foods")
+  @@schema("forma")
+}
+
+model FoodLog {
+  id        String   @id @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  foodId    String?  @map("food_id") @db.Uuid
+  date      DateTime @db.Date
+  meal      MealType
+  quantity  Decimal  @db.Decimal(10, 3)
+  nutrition Json
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  food      Food?    @relation(fields: [foodId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId, date])
+  @@map("food_logs")
+  @@schema("forma")
+}
+
+model FavoriteFood {
+  userId    String   @map("user_id") @db.Uuid
+  foodId    String   @map("food_id") @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  food      Food     @relation(fields: [foodId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@id([userId, foodId])
+  @@map("favorite_foods")
+  @@schema("forma")
+}
+
+model WeightLog {
+  id        String   @id @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  date      DateTime @db.Date
+  weightKg  Decimal  @map("weight_kg") @db.Decimal(6, 2)
+  note      String?
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId, date])
+  @@map("weight_logs")
+  @@schema("forma")
+}
+
+model Routine {
+  id               String            @id @db.Uuid
+  userId           String            @map("user_id") @db.Uuid
+  name             String
+  description      String?
+  exercises        Json
+  routineExercises RoutineExercise[]
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+
+  @@index([userId, updatedAt])
+  @@map("routines")
+  @@schema("forma")
+}
+
+model Workout {
+  id               String            @id @db.Uuid
+  userId           String            @map("user_id") @db.Uuid
+  routineId        String?           @map("routine_id") @db.Uuid
+  name             String
+  status           WorkoutStatus
+  startedAt        DateTime          @map("started_at")
+  finishedAt       DateTime?         @map("finished_at")
+  notes            String?
+  exercises        Json
+  workoutExercises WorkoutExercise[]
+  summary          Json?
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+
+  @@index([userId, status, startedAt])
+  @@map("workouts")
+  @@schema("forma")
+}
+
+model RoutineExercise {
+  id                   String  @id @default(uuid()) @db.Uuid
+  routineId            String  @map("routine_id") @db.Uuid
+  exerciseSource       String  @map("exercise_source")
+  exerciseId           String  @map("exercise_id")
+  exerciseNameSnapshot String  @map("exercise_name_snapshot")
+  order                Int
+  targetSets           Int     @map("target_sets")
+  targetReps           Int     @map("target_reps")
+  restSeconds          Int     @map("rest_seconds")
+  notes                String?
+  routine              Routine @relation(fields: [routineId], references: [id], onDelete: Cascade)
+
+  @@index([routineId, order])
+  @@map("routine_exercises")
+  @@schema("forma")
+}
+
+model WorkoutExercise {
+  id                   String       @id @db.Uuid
+  workoutId            String       @map("workout_id") @db.Uuid
+  exerciseSource       String       @map("exercise_source")
+  exerciseId           String       @map("exercise_id")
+  exerciseNameSnapshot String       @map("exercise_name_snapshot")
+  order                Int
+  notes                String?
+  workout              Workout      @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  sets                 WorkoutSet[]
+
+  @@index([workoutId, order])
+  @@map("workout_exercises")
+  @@schema("forma")
+}
+
+model WorkoutSet {
+  id                String          @id @db.Uuid
+  workoutExerciseId String          @map("workout_exercise_id") @db.Uuid
+  setNumber         Int             @map("set_number")
+  weightKg          Decimal?        @map("weight_kg") @db.Decimal(8, 2)
+  repetitions       Int
+  completed         Boolean         @default(false)
+  completedAt       DateTime?       @map("completed_at")
+  exercise          WorkoutExercise @relation(fields: [workoutExerciseId], references: [id], onDelete: Cascade)
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+
+  @@unique([workoutExerciseId, setNumber])
+  @@map("workout_sets")
+  @@schema("forma")
+}
+
+model MutationReceipt {
+  id           String   @id @db.Uuid
+  userId       String   @map("user_id") @db.Uuid
+  operation    String
+  resourceType String   @map("resource_type")
+  resourceId   String   @map("resource_id") @db.Uuid
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([userId, createdAt])
+  @@map("mutation_receipts")
+  @@schema("forma")
+}
