@@ -4,7 +4,12 @@ import { Apple, Scale, Dumbbell } from "lucide-react";
 import { useApp } from "./store/AppStore";
 import Layout from "./components/Layout";
 import { Loading, Sheet } from "./components/UI";
-import { Login, Register } from "./features/auth/AuthPages";
+import {
+  ForgotPassword,
+  Login,
+  Register,
+  ResetPassword,
+} from "./features/auth/AuthPages";
 import Onboarding from "./features/onboarding/Onboarding";
 import Home from "./features/dashboard/Home";
 import {
@@ -137,6 +142,8 @@ export default function App() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/onboarding" element={<Onboarding />} />
       <Route
         path="/app/*"

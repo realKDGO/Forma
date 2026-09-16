@@ -370,6 +370,20 @@ button:disabled {
 .auth-card {
   width: min(100%, 430px);
 }
+.auth-link {
+  justify-self: center;
+  font-weight: 700;
+}
+.password-field {
+  display: grid;
+  grid-template-columns: 1fr auto;
+}
+.password-field .input {
+  border-radius: 12px 0 0 12px;
+}
+.password-field .btn {
+  border-radius: 0 12px 12px 0;
+}
 .confirmation-message {
   display: flex;
   align-items: flex-start;

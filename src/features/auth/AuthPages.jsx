@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Mail, ShieldAlert } from "lucide-react";
 import { useApp } from "../../store/AppStore";
@@ -95,6 +95,11 @@ function AuthForm({ register = false }) {
           </p>
         )}
         <button className="btn" disabled={loading}>{loading ? "Please wait…" : register ? "Continue" : "Log in"}</button>
+        {!register && (
+          <Link className="auth-link" to="/forgot-password">
+            Forgot password?
+          </Link>
+        )}
         <p className="muted">
           {register ? "Already have an account? " : "New to Forma? "}
           <Link to={register ? "/login" : "/register"}>
@@ -144,3 +149,208 @@ function AuthForm({ register = false }) {
 }
 export const Login = () => <AuthForm />;
 export const Register = () => <AuthForm register />;
+
+export function ForgotPassword() {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
+
+  const submit = async (event) => {
+    event.preventDefault();
+    if (!email.includes("@")) return setError("Enter a valid email address.");
+    setLoading(true);
+    setError("");
+    try {
+      await authService.requestPasswordReset(email.trim());
+      setSent(true);
+    } catch {
+      setError(
+        "We couldn’t send the reset email. Please wait a moment and try again.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="auth">
+      <section className="card auth-card grid">
+        <Brand />
+        <div>
+          <p className="eyebrow">Account recovery</p>
+          <h1>Reset your password</h1>
+          <p className="muted">
+            Enter the email connected to your Forma account.
+          </p>
+        </div>
+        {sent ? (
+          <>
+            <div className="confirmation-message" role="status">
+              <Mail aria-hidden="true" />
+              <p>
+                If an account exists for <strong>{email}</strong>, a password
+                reset link has been sent.
+              </p>
+            </div>
+            <div className="spam-callout">
+              <ShieldAlert aria-hidden="true" />
+              <div>
+                <strong>Check your Spam folder</strong>
+                <p>The reset message may take a few minutes to arrive.</p>
+              </div>
+            </div>
+            <Link className="btn" to="/login">
+              Back to login
+            </Link>
+          </>
+        ) : (
+          <form className="grid" onSubmit={submit}>
+            <label className="field">
+              Email
+              <input
+                className="input"
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                autoComplete="email"
+                required
+              />
+            </label>
+            {error && (
+              <p className="error" role="alert">
+                {error}
+              </p>
+            )}
+            <button className="btn" disabled={loading}>
+              {loading ? "Sending…" : "Send reset link"}
+            </button>
+            <Link className="auth-link" to="/login">
+              Back to login
+            </Link>
+          </form>
+        )}
+      </section>
+    </div>
+  );
+}
+
+export function ResetPassword() {
+  const go = useNavigate();
+  const [password, setPassword] = useState("");
+  const [confirmation, setConfirmation] = useState("");
+  const [show, setShow] = useState(false);
+  const [checking, setChecking] = useState(true);
+  const [ready, setReady] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    authService.session().then((session) => {
+      if (active) {
+        setReady(Boolean(session));
+        setChecking(false);
+      }
+    });
+    const subscription = authService.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY" || session) {
+        setReady(true);
+        setChecking(false);
+      }
+    });
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const submit = async (event) => {
+    event.preventDefault();
+    if (password.length < 8)
+      return setError("Use at least 8 characters for your new password.");
+    if (password !== confirmation)
+      return setError("The passwords do not match.");
+    setLoading(true);
+    setError("");
+    try {
+      await authService.updatePassword(password);
+      await authService.logout();
+      go("/login", { replace: true });
+    } catch (err) {
+      setError(err.message || "Your password could not be updated.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="auth">
+      <section className="card auth-card grid">
+        <Brand />
+        <div>
+          <p className="eyebrow">Account recovery</p>
+          <h1>Choose a new password</h1>
+          <p className="muted">Use at least 8 characters.</p>
+        </div>
+        {checking ? (
+          <p className="muted" role="status">
+            Checking your reset link…
+          </p>
+        ) : ready ? (
+          <form className="grid" onSubmit={submit}>
+            <label className="field">
+              New password
+              <div className="password-field">
+                <input
+                  className="input"
+                  type={show ? "text" : "password"}
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  autoComplete="new-password"
+                  required
+                />
+                <button
+                  type="button"
+                  className="btn icon secondary"
+                  aria-label={show ? "Hide password" : "Show password"}
+                  onClick={() => setShow((current) => !current)}
+                >
+                  {show ? <EyeOff /> : <Eye />}
+                </button>
+              </div>
+            </label>
+            <label className="field">
+              Confirm new password
+              <input
+                className="input"
+                type={show ? "text" : "password"}
+                value={confirmation}
+                onChange={(event) => setConfirmation(event.target.value)}
+                autoComplete="new-password"
+                required
+              />
+            </label>
+            {error && (
+              <p className="error" role="alert">
+                {error}
+              </p>
+            )}
+            <button className="btn" disabled={loading}>
+              {loading ? "Updating…" : "Update password"}
+            </button>
+          </form>
+        ) : (
+          <div className="grid">
+            <p className="error" role="alert">
+              This reset link is invalid or has expired. Request a new one.
+            </p>
+            <Link className="btn" to="/forgot-password">
+              Request another link
+            </Link>
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
