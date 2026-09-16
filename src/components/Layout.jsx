@@ -69,13 +69,7 @@ export default function Layout({ children, onQuick }) {
         </div>
       </header>
       {!navigator.onLine && (
-        <div
-          style={{
-            textAlign: "center",
-            padding: 8,
-            background: "var(--surface-2)",
-          }}
-        >
+        <div className="offline-status" role="status">
           <WifiOff size={15} style={{ verticalAlign: "middle" }} /> Offline.
           Changes stay on this device.
         </div>

@@ -343,15 +343,14 @@ export function RoutineBuilder() {
           Add exercises
         </button>
         {items.map((e, i) => (
-          <div className="list-item" key={e.exerciseId}>
+          <div className="list-item routine-exercise" key={e.exerciseId}>
             <div className="list-item-main">
               <h3>{e.name}</h3>
-              <div style={{ display: "flex", gap: 6 }}>
+              <div className="routine-exercise-fields">
                 <label>
                   Sets
                   <input
                     className="input"
-                    style={{ width: 70 }}
                     type="number"
                     value={e.sets}
                     onChange={(x) =>
@@ -367,7 +366,6 @@ export function RoutineBuilder() {
                   Reps
                   <input
                     className="input"
-                    style={{ width: 70 }}
                     type="number"
                     value={e.reps}
                     onChange={(x) =>
@@ -383,7 +381,6 @@ export function RoutineBuilder() {
                   Rest
                   <input
                     className="input"
-                    style={{ width: 82 }}
                     type="number"
                     value={e.rest}
                     onChange={(x) =>
@@ -397,7 +394,7 @@ export function RoutineBuilder() {
                 </label>
               </div>
             </div>
-            <div>
+            <div className="item-actions">
               <button
                 className="btn icon secondary"
                 aria-label="Move up"
@@ -575,14 +572,7 @@ export function ActiveWorkout() {
                 .join(", ") || "No history"}
             </p>
           </div>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "38px 1fr 1fr 48px",
-              gap: 8,
-              alignItems: "center",
-            }}
-          >
+          <div className="set-grid">
             <strong>Set</strong>
             <strong>kg</strong>
             <strong>Reps</strong>
@@ -647,7 +637,7 @@ export function ActiveWorkout() {
       ))}
       {rest && (
         <div className="workout-bar">
-          <div>
+          <div className="workout-bar-actions">
             <small>Rest timer</small>
             <strong style={{ display: "block" }}>
               {Math.floor(rest.remaining / 60)}:

@@ -211,9 +211,7 @@ export default function Onboarding() {
           </div>
         </div>
         {content}
-        <div
-          style={{ display: "flex", gap: 8, justifyContent: "space-between" }}
-        >
+        <div className="onboarding-actions">
           {step > 0 ? (
             <button className="btn secondary" onClick={() => setStep(step - 1)}>
               Back

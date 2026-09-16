@@ -129,7 +129,7 @@ export function WeightProgress() {
         ))}
       </div>
       {data.length ? (
-        <div style={{ height: 220 }} aria-label="Weight chart">
+        <div className="chart-container" aria-label="Weight chart">
           <ResponsiveContainer>
             <LineChart data={data}>
               <CartesianGrid stroke="var(--border)" />
@@ -199,7 +199,7 @@ export function NutritionProgress() {
         <strong>{avg} kcal average</strong>
       </div>
       {data.length ? (
-        <div style={{ height: 220 }}>
+        <div className="chart-container">
           <ResponsiveContainer>
             <BarChart data={data}>
               <CartesianGrid stroke="var(--border)" />
@@ -272,7 +272,7 @@ export function StrengthProgress() {
         )}
       </div>
       {data.length ? (
-        <div style={{ height: 220 }}>
+        <div className="chart-container">
           <ResponsiveContainer>
             <LineChart data={data}>
               <CartesianGrid stroke="var(--border)" />

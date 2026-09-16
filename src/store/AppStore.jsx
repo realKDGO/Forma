@@ -15,6 +15,16 @@ export function AppProvider({ children }) {
     [toast, setToast] = useState(""),
     [error, setError] = useState("");
   useEffect(() => {
+    const demoRequested =
+      import.meta.env.DEV &&
+      import.meta.env.VITE_ENABLE_DEMO_TOOLS === "true" &&
+      new URLSearchParams(window.location.search).get("demo") === "1";
+    if (demoRequested) {
+      resetState("demo")
+        .then(setState)
+        .catch(() => setError("Local demo data could not be loaded."));
+      return;
+    }
     authService.session().then(async session => {
       const loaded=await loadState(session?.user?.id);
       setState({...loaded,session:{authenticated:!!session,onboarded:session?loaded.session?.onboarded||false:false,userId:session?.user?.id||null}});

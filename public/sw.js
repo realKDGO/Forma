@@ -1,4 +1,4 @@
-const CACHE = "forma-v0.1.0-assets-2";
+const CACHE = "forma-v0.1.0-assets-3";
 const SHELL = [
   "/",
   "/index.html",

@@ -57,7 +57,7 @@ export function Diary() {
         </div>
       </div>
       <section className="card">
-        <div className="metric">
+        <div className="date-navigation">
           <button
             className="btn icon secondary"
             aria-label="Previous day"
@@ -67,7 +67,6 @@ export function Diary() {
           </button>
           <input
             className="input"
-            style={{ maxWidth: 180 }}
             type="date"
             max={today()}
             value={date}

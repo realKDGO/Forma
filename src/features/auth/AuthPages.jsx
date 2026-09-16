@@ -82,10 +82,9 @@ function AuthForm({ register = false }) {
         </label>
         <label className="field">
           Password
-          <div style={{ display: "flex" }}>
+          <div className="password-field">
             <input
               className="input"
-              style={{ borderRadius: "12px 0 0 12px" }}
               type={show ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -93,8 +92,7 @@ function AuthForm({ register = false }) {
             />
             <button
               type="button"
-              className="btn secondary"
-              style={{ borderRadius: "0 12px 12px 0" }}
+              className="btn icon secondary"
               aria-label={show ? "Hide password" : "Show password"}
               onClick={() => setShow(!show)}
             >
