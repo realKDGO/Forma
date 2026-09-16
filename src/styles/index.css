@@ -98,14 +98,9 @@ button:disabled {
   font-size: 1.15rem;
 }
 .brandmark {
-  width: 34px;
+  width: 42px;
   height: 34px;
-  border-radius: 11px;
-  background: var(--primary);
-  color: var(--surface);
-  display: grid;
-  place-items: center;
-  font-weight: 900;
+  object-fit: contain;
 }
 .nav-bottom {
   position: fixed;
@@ -374,6 +369,33 @@ button:disabled {
 }
 .auth-card {
   width: min(100%, 430px);
+}
+.confirmation-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.confirmation-message svg,
+.spam-callout svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+.confirmation-message p,
+.spam-callout p {
+  margin: 0;
+}
+.spam-callout {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 14px;
+  border: 1px solid var(--warning);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--warning) 12%, var(--surface));
+}
+.spam-callout strong {
+  display: block;
+  margin-bottom: 4px;
 }
 .option {
   border: 1px solid var(--border);

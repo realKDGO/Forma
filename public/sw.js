@@ -1,5 +1,13 @@
-const CACHE = "forma-v0.1.0";
-const SHELL = ["/", "/index.html", "/manifest.webmanifest", "/icons/icon.svg"];
+const CACHE = "forma-v0.1.0-assets-2";
+const SHELL = [
+  "/",
+  "/index.html",
+  "/manifest.webmanifest",
+  "/icons/brand-logo.png",
+  "/icons/icon-192.png",
+  "/icons/icon-512.png",
+  "/icons/favicon.png",
+];
 self.addEventListener("install", (e) =>
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL))),
 );

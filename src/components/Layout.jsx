@@ -20,7 +20,12 @@ const nav = [
 export function Brand() {
   return (
     <div className="brand">
-      <span className="brandmark">F</span>
+      <img
+        className="brandmark"
+        src="/icons/brand-logo.png"
+        alt=""
+        aria-hidden="true"
+      />
       <span>Forma</span>
     </div>
   );

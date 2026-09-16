@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { X } from "lucide-react";
 export const Field = ({ label, error, help, children }) => (
   <div className="field">
@@ -33,6 +34,21 @@ export const ProgressBar = ({ label, value, target, unit = "g" }) => {
   );
 };
 export function Modal({ title, children, onClose, actions }) {
+  const dialogRef = useRef(null);
+  useEffect(() => {
+    const previousFocus = document.activeElement;
+    const dialog = dialogRef.current;
+    const focusTarget = dialog?.querySelector("button, a, input, select, textarea");
+    (focusTarget || dialog)?.focus();
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape" && onClose) onClose();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      previousFocus?.focus?.();
+    };
+  }, [onClose]);
   return (
     <div
       className="modal-wrap"
@@ -40,10 +56,12 @@ export function Modal({ title, children, onClose, actions }) {
       onMouseDown={(e) => e.target === e.currentTarget && onClose?.()}
     >
       <section
+        ref={dialogRef}
         className="modal"
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
+        tabIndex={-1}
       >
         <div className="page-head">
           <h2 id="modal-title">{title}</h2>

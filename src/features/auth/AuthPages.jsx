@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Mail, ShieldAlert } from "lucide-react";
 import { useApp } from "../../store/AppStore";
 import { Brand } from "../../components/Layout";
+import { Modal } from "../../components/UI";
 import { authService } from "../../services/authService";
 import { apiClient } from "../../services/apiClient";
 function AuthForm({ register = false }) {
@@ -14,6 +15,7 @@ function AuthForm({ register = false }) {
   const [loading, setLoading] = useState(false);
   const [show, setShow] = useState(false);
   const [error, setError] = useState("");
+  const [confirmationSent, setConfirmationSent] = useState(false);
   const submit = async (e) => {
     e.preventDefault();
     if (register && !name.trim()) return setError("Enter your name.");
@@ -24,7 +26,10 @@ function AuthForm({ register = false }) {
     setLoading(true); setError("");
     try {
       const session = register ? await authService.register(name.trim(),email,password) : await authService.login(email,password);
-      if (!session) return setError("Check your email to confirm the account, then log in.");
+      if (!session) {
+        setConfirmationSent(true);
+        return;
+      }
       let remote={};
       if(!register){try{remote=(await apiClient.get('/sync')).data.data}catch{remote={}}}
       const nextProfile=register?{name:name.trim(),units:'metric'}:(remote.profile || state.profile);
@@ -97,6 +102,43 @@ function AuthForm({ register = false }) {
           </Link>
         </p>
       </form>
+      {confirmationSent && (
+        <Modal
+          title="Confirm your email"
+          onClose={() => setConfirmationSent(false)}
+          actions={
+            <>
+              <button
+                className="btn secondary"
+                onClick={() => setConfirmationSent(false)}
+              >
+                Close
+              </button>
+              <button className="btn" onClick={() => go("/login")}>
+                Go to login
+              </button>
+            </>
+          }
+        >
+          <div className="confirmation-message">
+            <Mail aria-hidden="true" />
+            <p>
+              We sent a confirmation link to <strong>{email}</strong>. Open it
+              to verify your account and return to Forma onboarding.
+            </p>
+          </div>
+          <div className="spam-callout">
+            <ShieldAlert aria-hidden="true" />
+            <div>
+              <strong>Check your Spam folder</strong>
+              <p>
+                If the email is not in your inbox after a few minutes, check
+                your Spam or Junk folder and mark the message as not spam.
+              </p>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }
